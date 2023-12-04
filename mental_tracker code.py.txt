@@ -1,0 +1,377 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import warnings
+warnings.filterwarnings('ignore')
+
+
+# In[2]:
+
+
+import numpy as np    # Importing the NumPy library for linear algebra operations
+import pandas as pd   # Importing the Pandas library for data processing and CSV file handling
+
+
+# In[4]:
+
+
+import seaborn as sns                   # Importing the Seaborn library for statistical data visualization
+import matplotlib.pyplot as plt         # Importing the Matplotlib library for creating plots and visualizations
+import plotly.express as px             # Importing the Plotly Express library for interactive visualizations
+
+
+# In[5]:
+
+
+# Reading the CSV file containing prevalence data for mental and substance use disorder
+df1 = pd.read_csv("mental-and-substance-use-as-share-of-disease.csv")
+
+# Reading the CSV file containing data on mental and substance use as a share of disease
+df2 = pd.read_csv("prevalence-by-mental-and-substance-use-disorder.csv")
+
+
+# In[6]:
+
+
+df1.head()
+# Displaying the first few rows of the DataFrame df1
+
+
+# In[7]:
+
+
+df2.head(10)
+# Displaying the first few rows of the DataFrame df2
+
+
+# In[8]:
+
+
+data = pd.merge(df1, df2)
+data.head(10)
+# Merging df1 and df2 into a single DataFrame and displaying the first 10 rows of the merged DataFrame
+
+
+# In[9]:
+
+
+data.isnull().sum()
+# Checking the count of missing values (null values) in each column of the DataFrame data
+
+     
+
+
+# In[10]:
+
+
+data.drop('Code', axis=1, inplace=True)
+# Dropping the 'Code' column from the DataFrame data
+
+
+# In[11]:
+
+
+data.head(10)
+# Displaying the first 10 rows of the DataFrame data
+
+
+# In[12]:
+
+
+data.size, data.shape
+
+
+# In[15]:
+
+
+data.set_axis(['country', 'Year', 'Schizophrenia', 'Bipolar_disorder', 'Eating_disorder', 'Anxiety', 'drug_usage', 'depression', 'alcohol', 'mental_fitness'], axis='columns', inplace=True)
+
+
+# In[16]:
+
+
+data.head(10)
+
+
+# In[17]:
+
+
+plt.figure(figsize=(12, 6))
+sns.heatmap(data.corr(), annot=True, cmap='Blues')
+plt.plot()
+# Creating a heatmap of the correlation matrix for the columns in the DataFrame data
+
+
+# In[18]:
+
+
+sns.pairplot(data, corner=True)
+plt.show()
+# Creating a pairwise scatter plot matrix for the columns in the DataFrame data
+
+
+# In[19]:
+
+
+mean = data['mental_fitness'].mean()
+# Calculating the mean value of the 'mental_fitness' column in the DataFrame data
+mean
+# Displaying the calculated mean value
+     
+
+
+# In[20]:
+
+
+fig = px.pie(data, values='mental_fitness', names='Year')
+fig.show()
+# Creating a pie chart to visualize the distribution of mental fitness across different years
+     
+
+
+# In[21]:
+
+
+fig = px.line(data, x='Year', y='mental_fitness', color='country', markers=True, color_discrete_sequence=['red', 'blue'], template='plotly_dark')
+fig.show()
+# Creating a line plot to visualize the trend of mental fitness over time, differentiated by country
+
+     
+
+
+# In[22]:
+
+
+fig = px.line(data, x='Year', y='Schizophrenia', color='country', markers=True, color_discrete_sequence=['red', 'blue'], template='plotly_dark')
+fig.show()
+# Creating a line plot to visualize the trend of schizophrenia prevalence over time, differentiated by country
+     
+
+
+# In[23]:
+
+
+fig = px.scatter(data, x='Year', y='depression', color='country', size='mental_fitness', hover_data=['Schizophrenia'], template='plotly_dark')
+fig.show()
+# Creating a scatter plot to visualize the relationship between depression and mental fitness, differentiated by country
+     
+
+
+# In[24]:
+
+
+fig = px.bar(data, x='country', y='Bipolar_disorder', color='Year', barmode='group', template='plotly_dark')
+fig.update_layout(xaxis={'categoryorder':'total descending'})
+fig.show()
+# Creating a grouped bar chart to compare the prevalence of Bipolar Disorder across countries and years
+     
+
+
+# In[25]:
+
+
+fig = px.box(data, x='Year', y='Eating_disorder', color='country', template='plotly_dark')
+fig.show()
+# Creating a box plot to visualize the distribution of Eating Disorder prevalence across different years and countries
+     
+
+
+# In[26]:
+
+
+fig = px.histogram(data, x='Anxiety', color='country', marginal='box', template='plotly_dark')
+fig.show()
+# Creating a histogram with overlaid box plots to visualize the distribution of Anxiety levels across different countries
+     
+
+
+# In[27]:
+
+
+fig = px.scatter_matrix(data, dimensions=['depression', 'alcohol', 'drug_usage', 'mental_fitness'], color='country', template='plotly_dark')
+fig.show()
+# Creating a scatter matrix plot to visualize the relationships between multiple variables (depression, alcohol, drug usage, mental fitness) across different countries
+     
+
+
+# In[28]:
+
+
+fig = px.scatter(data, x='Year', y='depression', size='mental_fitness', color='country', template='plotly_dark')
+fig.show()
+# Creating a scatter plot to visualize the relationship between depression, mental fitness, and year, differentiated by country
+     
+
+
+# In[29]:
+
+
+fig = px.bar(data, x='country', y='Bipolar_disorder', color='Year', barmode='group', template='plotly_dark')
+fig.show()
+# Creating a grouped bar plot to compare the prevalence of Bipolar Disorder across different countries and years
+     
+
+
+# In[30]:
+
+
+df= data
+df.head(10)
+     
+
+
+# In[31]:
+
+
+# Display information about the DataFrame
+data.info()
+     
+
+
+# In[32]:
+
+
+from sklearn.preprocessing import LabelEncoder
+
+# Create an instance of LabelEncoder
+label_encoder = LabelEncoder()
+
+# Iterate over the columns of the DataFrame
+for column in df.columns:
+    # Check if the column data type is 'object' (categorical)
+    if df[column].dtype == 'object':
+        # Use the label encoder to transform the categorical data into numerical labels
+        df[column] = label_encoder.fit_transform(df[column])
+
+
+# In[33]:
+
+
+# Retrieve the shape of the DataFrame
+df_shape = df.shape
+
+# Print the shape of the DataFrame
+print(df_shape)
+     
+
+
+# In[34]:
+
+
+# Splitting the Data into Training and Testing Sets
+
+# In this step, the dataset is split into input features (X) and target variable (y). The target variable, 'mental_fitness', is dropped from the input features to create X, which contains the remaining columns.
+# The target variable, 'mental_fitness', is assigned to y.
+# The data is then split into training and testing sets using the train_test_split function from the sklearn.model_selection module. The test_size parameter is set to 0.20, indicating that 20% of the data will be used for testing, while 80% will be used for training.
+# The random_state parameter is set to 2 to ensure reproducibility of the split.
+
+import sklearn.model_selection as ms
+
+X = df.drop('mental_fitness', axis=1)
+y = df['mental_fitness']
+
+xtrain, xtest, ytrain, ytest = ms.train_test_split(X, y, test_size=0.20, random_state=2)
+     
+
+
+# In[35]:
+
+
+# Training (6840, 10)
+# 6840*80/100 = 5472
+# 6840*20/100 = 1368
+# Training (5472, 10)
+# The training data consists of 5,472 samples (80% of the total data) with 10 input features.
+
+# Testing (1368, 10)
+# The testing data consists of 1,368 samples (20% of the total data) with 10 input features.
+
+print("xtrain:", xtrain.shape)
+print("xtest:", xtest.shape)
+print("\nytrain:", ytrain.shape)
+print("ytest:", ytest.shape)
+
+# Comment: The code above prints the shape of the training and testing data.
+# The training data (xtrain) has a shape of (5472, 10), indicating 5,472 samples and 10 input features.
+# The testing data (xtest) has a shape of (1368, 10), indicating 1,368 samples and 10 input features.
+# The target variable for training (ytrain) has a shape matching the number of samples in xtrain, and the target variable for testing (ytest) has a shape matching the number of samples in xtest.
+
+# Ensure that the shapes printed match the expected dimensions of your training and testing data.
+
+
+# In[36]:
+
+
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Create a Linear Regression model and fit it to the training data
+lr = LinearRegression()
+lr.fit(xtrain, ytrain)
+
+# Make predictions on the training data
+ytrain_pred = lr.predict(xtrain)
+
+# Calculate Mean Squared Error (MSE) and R-squared score for training data
+mse = mean_squared_error(ytrain, ytrain_pred)
+r2 = r2_score(ytrain, ytrain_pred)
+
+# Print the performance metrics of the Linear Regression model on the training set
+print("Linear Regression model performance on the training set")
+print("-------------------------------------------------------")
+print("MSE: {}".format(mse))
+print("RMSE: {}".format(np.sqrt(mse)))  # Corrected the variable name to 'mse'
+print("R2 Score: {}".format(r2))
+
+
+# In[37]:
+
+
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Create a Random Forest Regressor model and fit it to the training data
+rf = RandomForestRegressor()
+rf.fit(xtrain, ytrain)
+
+# Make predictions on the training data
+ytrain_pred = rf.predict(xtrain)
+
+# Calculate Mean Squared Error (MSE), RMSE, and R-squared score for training data
+mse = mean_squared_error(ytrain, ytrain_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(ytrain, ytrain_pred)
+
+# Print the performance metrics of the Random Forest Regressor model on the training set
+print("Random Forest Regressor model performance on the training set")
+print("------------------------------------------------------------")
+print("MSE: {}".format(mse))
+print("RMSE: {}".format(rmse))
+print("R2 Score: {}".format(r2))
+
+
+# In[38]:
+
+
+# Compare the scores of the Linear Regression and Random Forest Regressor models
+
+# Calculate the scores of Linear Regression model
+lr_scores = lr.score(xtest, ytest)
+
+# Calculate the scores of Random Forest Regressor model
+rf_scores = rf.score(xtest, ytest)
+
+print("Evaluation of Models")
+print("---------------------")
+print("Linear Regression Score: {:.2f}".format(lr_scores))
+print("Random Forest Regressor Score: {:.2f}".format(rf_scores))
+
+
+# In[ ]:
+
+
+
+
